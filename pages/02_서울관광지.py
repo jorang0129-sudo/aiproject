@@ -1,15 +1,22 @@
 
+import streamlit as st
 import pandas as pd
 import pydeck as pdk
 
-# 페이지 설정
+# ==================================
+# 1. 페이지 설정
+# ==================================
+
 st.set_page_config(
     page_title="서울 관광지 TOP 10",
     page_icon="🗺️",
     layout="wide"
 )
 
-# 서울 주요 관광지 데이터
+# ==================================
+# 2. 서울 관광지 데이터
+# ==================================
+
 spots = [
     {
         "no": "1",
@@ -103,38 +110,46 @@ spots = [
     }
 ]
 
-# 제목
+df = pd.DataFrame(spots)
+
+# ==================================
+# 3. 앱 제목
+# ==================================
+
 st.title("🗺️ 외국인 관광객이 즐겨 찾는 서울 명소 TOP 10")
 
 st.markdown("""
-서울의 대표적인 관광지를 지도에서 확인해 보세요! 🇰🇷
+서울의 대표 관광지를 지도에서 확인해 보세요! 🇰🇷
 
-지도에 표시된 숫자를 아래 관광지 설명과 비교해 보세요.
+지도에 표시된 숫자와 아래 관광지 설명을 함께 확인해 보세요.
 """)
 
 st.info(
-    "이 목록은 서울의 대표 관광지를 바탕으로 구성한 추천 목록이며, "
+    "서울의 대표 관광지를 바탕으로 구성한 추천 목록입니다. "
     "공식적인 단일 외국인 선호도 순위는 아닙니다."
 )
 
-# 데이터프레임 생성
-df = pd.DataFrame(spots)
+# ==================================
+# 4. 지도 마커 설정
+# ==================================
 
-# 지도에 표시할 원형 마커
 marker_layer = pdk.Layer(
     "ScatterplotLayer",
     data=df,
     get_position="[lon, lat]",
     get_radius=190,
-    radius_min_pixels=7,
-    radius_max_pixels=15,
+    radius_min_pixels=8,
+    radius_max_pixels=16,
     get_fill_color=[225, 76, 66, 220],
-    get_line_color=[255, 255, 255, 230],
-    line_width_min_pixels=1,
+    get_line_color=[255, 255, 255, 255],
+    line_width_min_pixels=2,
     pickable=True
 )
 
-# 마커 위에 숫자 표시
+# ==================================
+# 5. 지도 숫자 표시
+# ==================================
+
 number_layer = pdk.Layer(
     "TextLayer",
     data=df,
@@ -150,7 +165,10 @@ number_layer = pdk.Layer(
     pickable=True
 )
 
-# 마커에 마우스를 올리면 관광지 정보 표시
+# ==================================
+# 6. 마커 설명 설정
+# ==================================
+
 tooltip = {
     "html": """
         <b>{no}. {name}</b><br/>
@@ -159,11 +177,15 @@ tooltip = {
     """,
     "style": {
         "backgroundColor": "#202938",
-        "color": "white"
+        "color": "white",
+        "padding": "10px"
     }
 }
 
-# 지도 설정
+# ==================================
+# 7. 서울 지도 생성
+# ==================================
+
 deck = pdk.Deck(
     layers=[
         marker_layer,
@@ -187,12 +209,19 @@ st.pydeck_chart(
     height=620
 )
 
-# 관광지 설명
-st.subheader("📍 서울 관광지 TOP 10")
+# ==================================
+# 8. 관광지 설명
+# ==================================
 
-st.write("각 관광지의 특징을 간단하게 알아볼까요?")
+st.divider()
 
-# 두 개씩 나란히 표시
+st.header("📍 서울 관광지 TOP 10")
+
+st.write(
+    "서울의 대표 관광지 10곳을 하나씩 살펴볼까요? 😊"
+)
+
+# 관광지 2개씩 나란히 표시
 for start in range(0, len(spots), 2):
 
     cols = st.columns(2)
@@ -203,15 +232,17 @@ for start in range(0, len(spots), 2):
 
             with st.container(border=True):
 
-                st.markdown(
-                    f"### {spot['no']}. {spot['name']}"
+                st.subheader(
+                    f"{spot['no']}. {spot['name']}"
                 )
 
                 st.caption(
-                    f"{spot['english']} · {spot['category']}"
+                    f"{spot['english']} | {spot['category']}"
                 )
 
-                st.write(spot["description"])
+                st.write(
+                    spot["description"]
+                )
 
                 map_url = (
                     "https://www.google.com/maps/search/?api=1&query="
@@ -222,7 +253,10 @@ for start in range(0, len(spots), 2):
                     f"[📍 지도에서 위치 보기]({map_url})"
                 )
 
-# 하단 안내
+# ==================================
+# 9. 마무리
+# ==================================
+
 st.divider()
 
 st.markdown("""
@@ -231,9 +265,9 @@ st.markdown("""
 서울에는 역사, 문화, 쇼핑, 먹거리 등
 다양한 매력을 가진 관광지가 있어요.
 
-여러분이 가장 가보고 싶은 장소는 어디인가요? 😊
+여러분이 가장 가보고 싶은 장소는 어디인가요? 🇰🇷
 """)
 
 st.caption(
-    "서울 대표 관광지 추천 지도 | 지도 데이터: CARTO"
+    "서울 관광지 추천 지도 | 지도 배경: CARTO"
 )
