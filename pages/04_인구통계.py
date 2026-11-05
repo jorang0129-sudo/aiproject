@@ -16,8 +16,12 @@ st.set_page_config(
 st.title("📊 서울시 연령별 인구 분석")
 st.write("서울시 자치구별 연령대 인구를 그래프로 분석해 보세요!")
 
-# CSV 파일 경로
-CSV_PATH = Path(__file__).parent / "population.csv"
+# ----------------------------------
+# 2. CSV 파일 경로 설정
+# ----------------------------------
+# 현재 파이썬 파일은 pages 폴더에 있고
+# CSV 파일은 상위 폴더에 있습니다.
+CSV_PATH = Path(__file__).parent.parent / "population.csv"
 
 # 연령대 목록
 AGE_GROUPS = [
@@ -34,20 +38,19 @@ AGE_GROUPS = [
     "100세 이상"
 ]
 
-
 # ----------------------------------
-# 2. CSV 파일 불러오기
+# 3. CSV 파일 불러오기
 # ----------------------------------
 @st.cache_data
 def load_data(path):
 
-    # 한글 파일이 깨지지 않도록 CP949 적용
+    # 한글이 깨지지 않도록 CP949 인코딩 적용
     df = pd.read_csv(
         path,
         encoding="cp949"
     )
 
-    # 인구수의 쉼표 제거 및 숫자 변환
+    # 인구수 쉼표 제거 및 숫자 변환
     for col in df.columns[1:]:
         df[col] = pd.to_numeric(
             df[col].astype(str).str.replace(",", "", regex=False),
@@ -66,10 +69,11 @@ def load_data(path):
 
 
 # ----------------------------------
-# 3. 데이터 오류 확인
+# 4. 데이터 오류 확인
 # ----------------------------------
 if not CSV_PATH.exists():
     st.error("population.csv 파일을 찾을 수 없습니다.")
+    st.write("현재 찾는 파일 위치:", str(CSV_PATH))
     st.stop()
 
 try:
@@ -85,7 +89,7 @@ except Exception as e:
 
 
 # ----------------------------------
-# 4. 연도 및 행정구 목록 만들기
+# 5. 연도 및 행정구 목록 만들기
 # ----------------------------------
 years = []
 
@@ -107,7 +111,7 @@ districts = df["행정구역"].dropna().unique().tolist()
 
 
 # ----------------------------------
-# 5. 선택 메뉴 만들기
+# 6. 선택 메뉴 만들기
 # ----------------------------------
 st.subheader("🔎 분석 조건 선택")
 
@@ -140,7 +144,7 @@ with col3:
 
 
 # ----------------------------------
-# 6. 선택한 데이터 추출
+# 7. 선택한 데이터 추출
 # ----------------------------------
 selected_rows = df[
     df["행정구역"] == selected_district
@@ -178,7 +182,7 @@ total = sum(values)
 
 
 # ----------------------------------
-# 7. 주요 인구 정보
+# 8. 주요 인구 정보
 # ----------------------------------
 st.subheader("📌 선택한 지역 정보")
 
@@ -201,7 +205,7 @@ m3.metric(
 
 
 # ----------------------------------
-# 8. 꺾은선 그래프 생성
+# 9. 꺾은선 그래프 생성
 # ----------------------------------
 st.subheader("📈 연령대별 인구수 그래프")
 
@@ -211,9 +215,7 @@ fig.add_trace(
     go.Scatter(
         x=chart_data["나이"],
         y=chart_data["인구수"],
-
         mode="lines+markers",
-
         name="인구수",
 
         # 하늘색 그래프
@@ -236,9 +238,8 @@ fig.add_trace(
 
 
 # ----------------------------------
-# 9. 그래프 눈금 및 디자인
+# 10. 그래프 눈금 및 디자인
 # ----------------------------------
-
 max_value = max(values) if values else 0
 
 y_max = max(
@@ -252,51 +253,34 @@ fig.update_layout(
 
     xaxis=dict(
         title="나이",
-
         type="category",
-
         categoryorder="array",
-
         categoryarray=AGE_GROUPS,
-
         tickmode="array",
-
         tickvals=AGE_GROUPS,
-
         ticktext=AGE_GROUPS,
-
         showgrid=True,
-
         dtick=1,
-
         gridcolor="#DCEAF2",
-
         gridwidth=1
     ),
 
     yaxis=dict(
         title="인구수 (명)",
-
         range=[0, y_max],
-
         tickmode="linear",
-
         tick0=0,
 
         # 세로축 100명 단위
         dtick=100,
 
         tickformat=",",
-
         showgrid=True,
-
         gridcolor="#DCEAF2",
-
         gridwidth=1
     ),
 
     plot_bgcolor="white",
-
     paper_bgcolor="white",
 
     font=dict(
@@ -306,7 +290,6 @@ fig.update_layout(
     ),
 
     hovermode="x unified",
-
     height=550,
 
     margin=dict(
@@ -319,7 +302,7 @@ fig.update_layout(
 
 
 # ----------------------------------
-# 10. 그래프 화면에 출력
+# 11. 그래프 화면에 출력
 # ----------------------------------
 st.plotly_chart(
     fig,
@@ -333,7 +316,7 @@ st.caption(
 
 
 # ----------------------------------
-# 11. 인구 데이터 표 출력
+# 12. 인구 데이터 표 출력
 # ----------------------------------
 with st.expander("📋 인구 데이터 자세히 보기"):
 
@@ -351,7 +334,7 @@ with st.expander("📋 인구 데이터 자세히 보기"):
 
 
 # ----------------------------------
-# 12. 성별 데이터 안내
+# 13. 성별 데이터 안내
 # ----------------------------------
 st.info(
     "현재 population.csv에는 남성과 여성의 "
