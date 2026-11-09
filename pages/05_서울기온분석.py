@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -11,11 +12,14 @@ st.set_page_config(
     layout="wide"
 )
 
+# 제목
 st.title("🌡️ 월별 기온분석")
-st.write("원하는 월을 선택하면 연도별 최고기온과 최저기온을 확인할 수 있어요.")
+st.write("월을 선택하면 연도별 최고기온과 최저기온을 비교할 수 있어요.")
 
 # CSV 파일 경로
-CSV_PATH = Path(__file__).parent / "temperature.csv"
+# 현재 py 파일은 pages 폴더 안에 있고
+# CSV 파일은 상위 폴더에 있음
+CSV_PATH = Path(__file__).resolve().parent.parent / "temperature.csv"
 
 
 # 데이터 불러오기
@@ -30,7 +34,7 @@ def load_data(file_path):
 
     # 날짜 변환 (예: Oct-07, Jan-08)
     data["일시"] = pd.to_datetime(
-        data["일시"],
+        data["일시"].astype(str).str.strip(),
         format="%b-%y",
         errors="coerce"
     )
@@ -47,7 +51,7 @@ def load_data(file_path):
             errors="coerce"
         )
 
-    # 결측치 제거
+    # 날짜와 기온 결측치 제거
     data = data.dropna(
         subset=["일시"] + temperature_columns
     ).copy()
@@ -59,22 +63,30 @@ def load_data(file_path):
     return data
 
 
-# CSV 파일 확인
+# CSV 파일 존재 확인
 if not CSV_PATH.exists():
-    st.error("temperature.csv 파일을 찾을 수 없습니다.")
+    st.error(
+        f"CSV 파일을 찾을 수 없습니다: {CSV_PATH}"
+    )
     st.stop()
 
 
-# 데이터 읽기
+# 데이터 불러오기
 try:
     df = load_data(CSV_PATH)
 
 except Exception as error:
-    st.error(f"데이터를 읽는 중 오류가 발생했습니다: {error}")
+    st.error(f"데이터를 불러오는 중 오류 발생: {error}")
     st.stop()
 
 
-# 월 선택
+# 데이터 확인
+if df.empty:
+    st.warning("분석할 데이터가 없습니다.")
+    st.stop()
+
+
+# 월 선택 메뉴
 month_names = {
     1: "1월",
     2: "2월",
@@ -97,16 +109,17 @@ selected_month = st.selectbox(
 )
 
 
-# 선택한 월 데이터 추출
+# 선택한 월의 데이터 추출
 monthly_data = df[
     df["월"] == selected_month
 ].copy()
 
-# 연도순 정렬
+
+# 연도별 정렬
 monthly_data = monthly_data.sort_values("연도")
 
 
-# 연도별 데이터 정리
+# 연도별 최고기온과 최저기온 계산
 yearly_data = (
     monthly_data
     .groupby("연도", as_index=False)
@@ -116,17 +129,17 @@ yearly_data = (
 )
 
 
-# 데이터 존재 여부 확인
+# 데이터가 없을 경우
 if yearly_data.empty:
     st.warning("선택한 월의 데이터가 없습니다.")
     st.stop()
 
 
-# 그래프 생성
+# 꺾은선 그래프 생성
 fig = go.Figure()
 
 
-# 최고기온 그래프 (핫핑크)
+# 최고기온 그래프 - 핫핑크
 fig.add_trace(
     go.Scatter(
         x=yearly_data["연도"],
@@ -145,7 +158,7 @@ fig.add_trace(
 )
 
 
-# 최저기온 그래프 (파란색)
+# 최저기온 그래프 - 파란색
 fig.add_trace(
     go.Scatter(
         x=yearly_data["연도"],
@@ -166,7 +179,10 @@ fig.add_trace(
 
 # 그래프 제목 및 축 설정
 fig.update_layout(
-    title="월별 기온분석",
+    title={
+        "text": "월별 기온분석",
+        "x": 0.5
+    },
     xaxis_title="연도",
     yaxis_title="온도(℃)",
     legend_title="기온 구분",
@@ -192,3 +208,23 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+
+
+# 데이터 분석 요약
+st.subheader("📌 기온 분석 요약")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    max_temp = yearly_data["최고기온(℃)"].max()
+    st.metric(
+        label="가장 높은 최고기온",
+        value=f"{max_temp:.1f}℃"
+    )
+
+with col2:
+    min_temp = yearly_data["최저기온(℃)"].min()
+    st.metric(
+        label="가장 낮은 최저기온",
+        value=f"{min_temp:.1f}℃"
+    )
