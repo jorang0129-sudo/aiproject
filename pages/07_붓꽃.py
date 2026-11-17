@@ -22,19 +22,28 @@ st.set_page_config(
 
 
 # --------------------------------------------------
-# 핑크 봄 테마 CSS
+# 핑크 그라데이션 봄 테마 CSS
 # --------------------------------------------------
 st.markdown("""
 <style>
 
-/* 전체 배경 */
+/* 전체 배경: 핑크 그라데이션 */
 .stApp {
     background: linear-gradient(
-        180deg,
-        #fff0f6 0%,
-        #fff7fa 45%,
-        #ffffff 100%
+        135deg,
+        #ffb6d2 0%,
+        #ffd1e3 25%,
+        #ffe3ee 50%,
+        #ffc6dc 75%,
+        #fff0f6 100%
     );
+
+    background-attachment: fixed;
+}
+
+/* 메인 콘텐츠 배경 투명하게 */
+.stMainBlockContainer {
+    background: transparent;
 }
 
 /* 기본 글자 */
@@ -56,7 +65,11 @@ h2, h3 {
 
 /* 버튼 */
 .stButton > button {
-    background: linear-gradient(90deg, #ff8eb5, #f56f9d);
+    background: linear-gradient(
+        90deg,
+        #ff8eb5,
+        #f56f9d
+    );
     color: white;
     border: none;
     border-radius: 20px;
@@ -89,17 +102,24 @@ div[data-baseweb="select"] > div {
     color: white !important;
 }
 
-/* 꽃잎 애니메이션 */
+/* --------------------------------------------------
+   꽃잎 애니메이션
+-------------------------------------------------- */
+
 .flower {
     position: fixed;
     top: -12%;
     z-index: 9999;
     pointer-events: none;
     user-select: none;
+
     animation-name: fall;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    opacity: 0.9;
+
+    /* 꽃잎 80% 투명 */
+    opacity: 0.2;
+
     will-change: transform;
 }
 
@@ -126,7 +146,7 @@ div[data-baseweb="select"] > div {
     }
 }
 
-/* 35개의 꽃잎: 위치, 속도, 크기, 시작 시간 */
+/* 꽃잎 35개: 위치, 속도, 크기 */
 .flower:nth-of-type(1)  { left: 2%;  animation-duration: 5s; animation-delay: 0s; font-size: 25px; }
 .flower:nth-of-type(2)  { left: 5%;  animation-duration: 7s; animation-delay: 1s; font-size: 30px; }
 .flower:nth-of-type(3)  { left: 8%;  animation-duration: 4s; animation-delay: 2s; font-size: 22px; }
@@ -165,7 +185,11 @@ div[data-baseweb="select"] > div {
 
 /* 결과 카드 */
 .result-card {
-    background: linear-gradient(135deg, #fff0f6, #ffe0ec);
+    background: linear-gradient(
+        135deg,
+        #fff0f6,
+        #ffe0ec
+    );
     border: 2px solid #ffc1d5;
     border-radius: 20px;
     padding: 20px;
@@ -294,18 +318,13 @@ if not all(col in df.columns for col in required_columns):
 
 df = df.dropna(subset=required_columns)
 
-if df.empty:
-    st.error("분석할 데이터가 없습니다.")
-    st.stop()
-
-# 숫자 데이터 변환
 for col in required_columns[:4]:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
 df = df.dropna(subset=required_columns[:4])
 
 if df.empty:
-    st.error("숫자로 변환할 수 있는 데이터가 없습니다.")
+    st.error("분석할 데이터가 없습니다.")
     st.stop()
 
 
@@ -584,7 +603,7 @@ with st.expander("🌸 KNN (K-Nearest Neighbors)"):
 # --------------------------------------------------
 st.markdown("""
 <div style="
-    background:linear-gradient(90deg,#ffe1ec,#fff5f8,#ffe1ec);
+    background:linear-gradient(90deg,#ffb6d2,#ffe3ee,#ffc6dc);
     border-radius:20px;
     padding:20px;
     text-align:center;
@@ -595,3 +614,4 @@ st.markdown("""
     <p>🌷 🌸 🌷 🌸 🌷 🌸 🌷</p>
 </div>
 """, unsafe_allow_html=True)
+
