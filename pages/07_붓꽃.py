@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 # 페이지 설정
 # --------------------------------------------------
 st.set_page_config(
-    page_title="🌸 봄날의 붓꽃 예측",
+    page_title="봄날의 붓꽃 예측",
     page_icon="🌸",
     layout="wide"
 )
@@ -42,7 +42,7 @@ html, body, [class*="css"] {
     color: #75445d;
 }
 
-/* 메인 제목 */
+/* 제목 */
 h1 {
     color: #e75480 !important;
     text-align: center;
@@ -50,14 +50,8 @@ h1 {
     text-shadow: 2px 2px 5px #ffc5d8;
 }
 
-/* 소제목 */
 h2, h3 {
     color: #d94f83 !important;
-}
-
-/* 설명 문구 */
-p {
-    color: #80556a;
 }
 
 /* 버튼 */
@@ -74,11 +68,6 @@ div[data-baseweb="select"] > div {
     background-color: #fff8fb;
     border: 1px solid #ffc1d5;
     border-radius: 12px;
-}
-
-/* 입력 슬라이더 */
-.stSlider [data-baseweb="slider"] div {
-    background-color: #f58db0;
 }
 
 /* 탭 */
@@ -100,103 +89,81 @@ div[data-baseweb="select"] > div {
     color: white !important;
 }
 
-/* 데이터프레임 */
-.stDataFrame {
-    background-color: #fff8fb;
-    border-radius: 15px;
-}
-
-/* 안내 상자 */
-div[data-testid="stAlert"] {
-    background-color: #fff0f6;
-    border-radius: 15px;
-}
-
 /* 꽃잎 애니메이션 */
 .flower {
     position: fixed;
-    top: -10%;
+    top: -12%;
     z-index: 9999;
     pointer-events: none;
+    user-select: none;
     animation-name: fall;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    opacity: 0.8;
+    opacity: 0.9;
+    will-change: transform;
 }
 
+/* 꽃잎이 빠르게 떨어지며 좌우로 흔들림 */
 @keyframes fall {
     0% {
-        transform: translateY(-10vh) rotate(0deg);
+        transform: translate3d(0, -12vh, 0) rotate(0deg);
     }
+
+    25% {
+        transform: translate3d(45px, 18vh, 0) rotate(90deg);
+    }
+
+    50% {
+        transform: translate3d(-35px, 50vh, 0) rotate(180deg);
+    }
+
+    75% {
+        transform: translate3d(50px, 82vh, 0) rotate(270deg);
+    }
+
     100% {
-        transform: translateY(115vh) rotate(360deg);
+        transform: translate3d(-25px, 115vh, 0) rotate(360deg);
     }
 }
 
-/* 꽃잎 위치와 속도 */
-.flower:nth-child(1) {
-    left: 5%;
-    animation-duration: 12s;
-    font-size: 22px;
-}
+/* 35개의 꽃잎: 위치, 속도, 크기, 시작 시간 */
+.flower:nth-of-type(1)  { left: 2%;  animation-duration: 5s; animation-delay: 0s; font-size: 25px; }
+.flower:nth-of-type(2)  { left: 5%;  animation-duration: 7s; animation-delay: 1s; font-size: 30px; }
+.flower:nth-of-type(3)  { left: 8%;  animation-duration: 4s; animation-delay: 2s; font-size: 22px; }
+.flower:nth-of-type(4)  { left: 11%; animation-duration: 6s; animation-delay: 0.5s; font-size: 28px; }
+.flower:nth-of-type(5)  { left: 14%; animation-duration: 5s; animation-delay: 3s; font-size: 24px; }
+.flower:nth-of-type(6)  { left: 17%; animation-duration: 7s; animation-delay: 1.5s; font-size: 32px; }
+.flower:nth-of-type(7)  { left: 20%; animation-duration: 4s; animation-delay: 2.5s; font-size: 25px; }
+.flower:nth-of-type(8)  { left: 23%; animation-duration: 6s; animation-delay: 1s; font-size: 29px; }
+.flower:nth-of-type(9)  { left: 26%; animation-duration: 5s; animation-delay: 3.5s; font-size: 23px; }
+.flower:nth-of-type(10) { left: 29%; animation-duration: 7s; animation-delay: 2s; font-size: 30px; }
+.flower:nth-of-type(11) { left: 32%; animation-duration: 4s; animation-delay: 0.5s; font-size: 26px; }
+.flower:nth-of-type(12) { left: 35%; animation-duration: 6s; animation-delay: 3s; font-size: 32px; }
+.flower:nth-of-type(13) { left: 38%; animation-duration: 5s; animation-delay: 1s; font-size: 24px; }
+.flower:nth-of-type(14) { left: 41%; animation-duration: 7s; animation-delay: 2.5s; font-size: 28px; }
+.flower:nth-of-type(15) { left: 44%; animation-duration: 4s; animation-delay: 1.5s; font-size: 22px; }
+.flower:nth-of-type(16) { left: 47%; animation-duration: 6s; animation-delay: 3.5s; font-size: 30px; }
+.flower:nth-of-type(17) { left: 50%; animation-duration: 5s; animation-delay: 0s; font-size: 27px; }
+.flower:nth-of-type(18) { left: 53%; animation-duration: 7s; animation-delay: 2s; font-size: 25px; }
+.flower:nth-of-type(19) { left: 56%; animation-duration: 4s; animation-delay: 1s; font-size: 31px; }
+.flower:nth-of-type(20) { left: 59%; animation-duration: 6s; animation-delay: 3s; font-size: 23px; }
+.flower:nth-of-type(21) { left: 62%; animation-duration: 5s; animation-delay: 1.5s; font-size: 29px; }
+.flower:nth-of-type(22) { left: 65%; animation-duration: 7s; animation-delay: 0.5s; font-size: 24px; }
+.flower:nth-of-type(23) { left: 68%; animation-duration: 4s; animation-delay: 2.5s; font-size: 32px; }
+.flower:nth-of-type(24) { left: 71%; animation-duration: 6s; animation-delay: 1s; font-size: 26px; }
+.flower:nth-of-type(25) { left: 74%; animation-duration: 5s; animation-delay: 3s; font-size: 28px; }
+.flower:nth-of-type(26) { left: 77%; animation-duration: 7s; animation-delay: 1.5s; font-size: 22px; }
+.flower:nth-of-type(27) { left: 80%; animation-duration: 4s; animation-delay: 0.5s; font-size: 30px; }
+.flower:nth-of-type(28) { left: 83%; animation-duration: 6s; animation-delay: 2s; font-size: 25px; }
+.flower:nth-of-type(29) { left: 86%; animation-duration: 5s; animation-delay: 3.5s; font-size: 31px; }
+.flower:nth-of-type(30) { left: 89%; animation-duration: 7s; animation-delay: 1s; font-size: 24px; }
+.flower:nth-of-type(31) { left: 92%; animation-duration: 4s; animation-delay: 2.5s; font-size: 28px; }
+.flower:nth-of-type(32) { left: 95%; animation-duration: 6s; animation-delay: 0s; font-size: 23px; }
+.flower:nth-of-type(33) { left: 98%; animation-duration: 5s; animation-delay: 2s; font-size: 30px; }
+.flower:nth-of-type(34) { left: 7%;  animation-duration: 4.5s; animation-delay: 4s; font-size: 20px; }
+.flower:nth-of-type(35) { left: 88%; animation-duration: 5.5s; animation-delay: 4.5s; font-size: 27px; }
 
-.flower:nth-child(2) {
-    left: 15%;
-    animation-duration: 17s;
-    animation-delay: 2s;
-    font-size: 28px;
-}
-
-.flower:nth-child(3) {
-    left: 25%;
-    animation-duration: 14s;
-    animation-delay: 5s;
-    font-size: 20px;
-}
-
-.flower:nth-child(4) {
-    left: 38%;
-    animation-duration: 19s;
-    animation-delay: 1s;
-    font-size: 25px;
-}
-
-.flower:nth-child(5) {
-    left: 50%;
-    animation-duration: 13s;
-    animation-delay: 4s;
-    font-size: 30px;
-}
-
-.flower:nth-child(6) {
-    left: 62%;
-    animation-duration: 16s;
-    animation-delay: 3s;
-    font-size: 23px;
-}
-
-.flower:nth-child(7) {
-    left: 73%;
-    animation-duration: 18s;
-    animation-delay: 6s;
-    font-size: 27px;
-}
-
-.flower:nth-child(8) {
-    left: 85%;
-    animation-duration: 15s;
-    animation-delay: 2s;
-    font-size: 21px;
-}
-
-.flower:nth-child(9) {
-    left: 95%;
-    animation-duration: 20s;
-    animation-delay: 7s;
-    font-size: 26px;
-}
-
-/* 카드 디자인 */
+/* 결과 카드 */
 .result-card {
     background: linear-gradient(135deg, #fff0f6, #ffe0ec);
     border: 2px solid #ffc1d5;
@@ -215,6 +182,12 @@ div[data-testid="stAlert"] {
     color: #e75480;
 }
 
+/* 안내 상자 */
+div[data-testid="stAlert"] {
+    background-color: #fff0f6;
+    border-radius: 15px;
+}
+
 /* 구분선 */
 hr {
     border-color: #ffc1d5;
@@ -222,6 +195,7 @@ hr {
 
 </style>
 
+<!-- 화면 전체에 흩날리는 꽃잎 35개 -->
 <div class="flower">🌸</div>
 <div class="flower">🌷</div>
 <div class="flower">🌸</div>
@@ -230,6 +204,32 @@ hr {
 <div class="flower">🌷</div>
 <div class="flower">🌸</div>
 <div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
+<div class="flower">🌸</div>
+<div class="flower">🌺</div>
+<div class="flower">🌸</div>
+<div class="flower">🌷</div>
 <div class="flower">🌸</div>
 
 """, unsafe_allow_html=True)
@@ -240,26 +240,23 @@ hr {
 # --------------------------------------------------
 st.title("🌸 봄날의 붓꽃 품종 예측 🌸")
 
-st.markdown(
-    """
-    <div style="
-        text-align:center;
-        background:linear-gradient(90deg,#ffe1ec,#fff5f8,#ffe1ec);
-        padding:18px;
-        border-radius:20px;
-        margin-bottom:20px;
-        border:2px solid #ffc1d5;
-    ">
-        <h3 style="color:#d94f83;">
-            🌷 꽃의 길이와 너비로 붓꽃의 품종을 알아봐요! 🌷
-        </h3>
-        <p>
-            세 가지 인공지능 알고리즘이 어떤 품종을 예측하는지 비교해 보세요.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div style="
+    text-align:center;
+    background:linear-gradient(90deg,#ffe1ec,#fff5f8,#ffe1ec);
+    padding:18px;
+    border-radius:20px;
+    margin-bottom:20px;
+    border:2px solid #ffc1d5;
+">
+    <h3 style="color:#d94f83;">
+        🌷 꽃의 길이와 너비로 붓꽃의 품종을 알아봐요! 🌷
+    </h3>
+    <p>
+        세 가지 인공지능 알고리즘이 어떤 품종을 예측하는지 비교해 보세요.
+    </p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # --------------------------------------------------
@@ -301,8 +298,15 @@ if df.empty:
     st.error("분석할 데이터가 없습니다.")
     st.stop()
 
-X = df[required_columns[:4]]
-y = df["품종"]
+# 숫자 데이터 변환
+for col in required_columns[:4]:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+df = df.dropna(subset=required_columns[:4])
+
+if df.empty:
+    st.error("숫자로 변환할 수 있는 데이터가 없습니다.")
+    st.stop()
 
 
 # --------------------------------------------------
@@ -379,7 +383,7 @@ def run_prediction(features, x_label, y_label, tab_key):
 
     for model_name, model in models.items():
 
-        model.fit(df[features], y)
+        model.fit(df[features], df["품종"])
 
         prediction = model.predict(input_data)[0]
 
@@ -407,6 +411,8 @@ def run_prediction(features, x_label, y_label, tab_key):
         probability_results.append(probability_row)
 
     # 알고리즘 비교표
+    st.markdown("#### 💗 알고리즘 예측 결과 비교")
+
     result_df = pd.DataFrame(results)
 
     st.dataframe(
@@ -443,6 +449,11 @@ def run_prediction(features, x_label, y_label, tab_key):
         probability_df,
         use_container_width=True,
         hide_index=True
+    )
+
+    st.caption(
+        "※ 예측 확률은 각 알고리즘이 계산한 값이며, "
+        "알고리즘 간 확률을 직접적인 성능 비교로 해석하면 안 됩니다."
     )
 
     # 그래프
@@ -483,7 +494,7 @@ def run_prediction(features, x_label, y_label, tab_key):
 
     ax.set_xlabel(x_label + " (cm)")
     ax.set_ylabel(y_label + " (cm)")
-    ax.set_title("🌸 붓꽃의 특징 분포")
+    ax.set_title("붓꽃의 특징 분포")
     ax.legend()
     ax.grid(alpha=0.2)
 
