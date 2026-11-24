@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from pathlib import Path
 import re
+import random
 
 # --------------------------------------------------
 # 1. 페이지 기본 설정
@@ -17,11 +18,12 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # --------------------------------------------------
-# 2. 배경 디자인 및 빠르게 떨어지는 물방울 효과
+# 2. 배경 디자인 및 랜덤 물방울 효과
 # --------------------------------------------------
 
-st.markdown("""
+rain_css = """
 <style>
 
 /* 전체 배경 */
@@ -34,57 +36,43 @@ st.markdown("""
         #f8fdff 100%
     );
     background-attachment: fixed;
+    overflow-x: hidden;
 }
 
-/* 첫 번째 물방울 */
-.stApp::before {
-    content: "💧  💧   💧  💧   💧  💧   💧  💧   💧  💧   💧  💧";
+/* 물방울 전체 레이어 */
+.rain-container {
     position: fixed;
-    top: -100px;
+    top: 0;
     left: 0;
     width: 100%;
-    height: 120%;
-    font-size: 22px;
-    letter-spacing: 15px;
-    word-spacing: 15px;
-    opacity: 0.30;
+    height: 100vh;
+    overflow: hidden;
     pointer-events: none;
     z-index: 0;
-    white-space: normal;
-    line-height: 110px;
-    animation: rainFall 12s linear infinite;
 }
 
-/* 두 번째 물방울 */
-.stApp::after {
-    content: "💧    💧  💧    💧  💧    💧  💧    💧  💧    💧";
-    position: fixed;
-    top: -150px;
-    left: 5%;
-    width: 100%;
-    height: 130%;
-    font-size: 17px;
-    letter-spacing: 25px;
-    opacity: 0.20;
-    pointer-events: none;
-    z-index: 0;
-    white-space: normal;
-    line-height: 85px;
-    animation: rainFall 8s linear infinite;
+/* 각각의 물방울 */
+.raindrop {
+    position: absolute;
+    top: -50px;
+    animation-name: falling;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
 }
 
-/* 물방울 이동 */
-@keyframes rainFall {
+/* 물방울 낙하 */
+@keyframes falling {
     0% {
-        transform: translateY(-100px);
+        transform: translateY(-60px) rotate(0deg);
     }
 
     100% {
-        transform: translateY(110vh);
+        transform: translateY(110vh) rotate(15deg);
     }
 }
 
-/* 콘텐츠를 배경 효과보다 위에 표시 */
+/* 콘텐츠 */
 .stMainBlockContainer {
     position: relative;
     z-index: 1;
@@ -107,7 +95,39 @@ div[data-baseweb="select"] {
 }
 
 </style>
-""", unsafe_allow_html=True)
+"""
+
+# 물방울 120개 생성
+rain_drops = []
+
+for i in range(120):
+
+    left = random.uniform(0, 100)
+    size = random.randint(12, 24)
+    duration = random.uniform(5, 13)
+    delay = random.uniform(-13, 0)
+    opacity = random.uniform(0.12, 0.45)
+
+    drop = f"""
+    <span class="raindrop" style="
+        left: {left:.2f}%;
+        font-size: {size}px;
+        opacity: {opacity:.2f};
+        animation-duration: {duration:.2f}s;
+        animation-delay: {delay:.2f}s;
+    ">💧</span>
+    """
+
+    rain_drops.append(drop)
+
+rain_html = (
+    rain_css
+    + '<div class="rain-container">'
+    + "".join(rain_drops)
+    + "</div>"
+)
+
+st.markdown(rain_html, unsafe_allow_html=True)
 
 
 # --------------------------------------------------
