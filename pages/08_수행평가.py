@@ -20,30 +20,35 @@ st.set_page_config(
 
 
 # --------------------------------------------------
-# 2. 배경 디자인 및 랜덤 물방울 효과
+# 2. 배경 디자인 및 랜덤 빗방울 효과
 # --------------------------------------------------
 
 rain_css = """
 <style>
 
-/* 전체 배경 */
-.stApp {
+/* 전체 하늘색 그라데이션 배경 */
+.stApp,
+[data-testid="stAppViewContainer"] {
     background: linear-gradient(
         180deg,
         #fafdff 0%,
         #f0faff 35%,
         #eaf7ff 70%,
         #f8fdff 100%
-    );
-    background-attachment: fixed;
-    overflow-x: hidden;
+    ) !important;
+
+    background-attachment: fixed !important;
 }
 
-/* 물방울 전체 레이어 */
+/* 메인 콘텐츠 배경 투명하게 */
+[data-testid="stMain"] {
+    background: transparent !important;
+}
+
+/* 물방울 배경 레이어 */
 .rain-container {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100vh;
     overflow: hidden;
@@ -54,25 +59,30 @@ rain_css = """
 /* 각각의 물방울 */
 .raindrop {
     position: absolute;
-    top: -50px;
-    animation-name: falling;
+    top: -60px;
+    display: block;
+    line-height: 1;
+    animation-name: rainFall;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     will-change: transform;
 }
 
-/* 물방울 낙하 */
-@keyframes falling {
+/* 물방울 낙하 애니메이션 */
+@keyframes rainFall {
+
     0% {
-        transform: translateY(-60px) rotate(0deg);
+        transform: translateY(-60px);
     }
 
     100% {
-        transform: translateY(110vh) rotate(15deg);
+        transform: translateY(110vh);
     }
+
 }
 
-/* 콘텐츠 */
+/* Streamlit 콘텐츠를 물방울 위에 표시 */
+[data-testid="stMain"] > div,
 .stMainBlockContainer {
     position: relative;
     z-index: 1;
@@ -97,17 +107,27 @@ div[data-baseweb="select"] {
 </style>
 """
 
-# 물방울 120개 생성
+# 물방울 150개 생성
 rain_drops = []
 
-for i in range(120):
+for i in range(150):
 
+    # 화면 전체에서 랜덤 위치
     left = random.uniform(0, 100)
-    size = random.randint(12, 24)
-    duration = random.uniform(5, 13)
-    delay = random.uniform(-13, 0)
+
+    # 크기 다양하게
+    size = random.randint(12, 25)
+
+    # 낙하 속도 다양하게
+    duration = random.uniform(4, 12)
+
+    # 시작 시간 다르게
+    delay = random.uniform(-12, 0)
+
+    # 투명도 다양하게
     opacity = random.uniform(0.12, 0.45)
 
+    # 물방울 하나 생성
     drop = f"""
     <span class="raindrop" style="
         left: {left:.2f}%;
@@ -120,14 +140,18 @@ for i in range(120):
 
     rain_drops.append(drop)
 
+# 배경과 물방울 합치기
 rain_html = (
     rain_css
     + '<div class="rain-container">'
     + "".join(rain_drops)
-    + "</div>"
+    + '</div>'
 )
 
-st.markdown(rain_html, unsafe_allow_html=True)
+st.markdown(
+    rain_html,
+    unsafe_allow_html=True
+)
 
 
 # --------------------------------------------------
@@ -186,7 +210,9 @@ df["강수량(mm)"] = pd.to_numeric(
     errors="coerce"
 )
 
-df = df.dropna(subset=["일시", "강수량(mm)"])
+df = df.dropna(
+    subset=["일시", "강수량(mm)"]
+)
 
 
 # 월 이름 변환
@@ -217,7 +243,9 @@ def extract_date(value):
     )
 
     if match:
+
         month_name = match.group(1).title()
+
         year_2digit = int(match.group(2))
 
         month = month_dict.get(month_name)
@@ -232,15 +260,22 @@ def extract_date(value):
     return pd.Series([np.nan, np.nan])
 
 
-df[["연도", "월"]] = df["일시"].apply(extract_date)
+df[["연도", "월"]] = df["일시"].apply(
+    extract_date
+)
 
-df = df.dropna(subset=["연도", "월"])
+df = df.dropna(
+    subset=["연도", "월"]
+)
 
 df["연도"] = df["연도"].astype(int)
+
 df["월"] = df["월"].astype(int)
 
 # 연도와 월 순서로 정렬
-df = df.sort_values(["연도", "월"])
+df = df.sort_values(
+    ["연도", "월"]
+)
 
 
 # --------------------------------------------------
@@ -267,6 +302,7 @@ month_names = {
 }
 
 with col1:
+
     selected_month = st.selectbox(
         "🌱 분석할 월을 선택하세요",
         list(month_names.keys()),
@@ -274,6 +310,7 @@ with col1:
     )
 
 with col2:
+
     selected_year = st.number_input(
         "🔮 예측할 연도를 선택하세요",
         min_value=2027,
@@ -284,10 +321,16 @@ with col2:
 
 
 # 선택한 월의 데이터만 추출
-month_df = df[df["월"] == selected_month].copy()
+month_df = df[
+    df["월"] == selected_month
+].copy()
 
 if len(month_df) < 2:
-    st.warning("선택한 월의 데이터가 충분하지 않아요.")
+
+    st.warning(
+        "선택한 월의 데이터가 충분하지 않아요."
+    )
+
     st.stop()
 
 
@@ -296,14 +339,18 @@ if len(month_df) < 2:
 # --------------------------------------------------
 
 X = month_df[["연도"]]
+
 y = month_df["강수량(mm)"]
 
 model = LinearRegression()
+
 model.fit(X, y)
 
 # 선택한 연도의 강수량 예측
 prediction = model.predict(
-    pd.DataFrame({"연도": [selected_year]})
+    pd.DataFrame({
+        "연도": [selected_year]
+    })
 )[0]
 
 # 강수량은 음수가 될 수 없으므로 0으로 제한
@@ -311,7 +358,9 @@ prediction = max(0, prediction)
 
 # 회귀식 정보
 slope = model.coef_[0]
+
 intercept = model.intercept_
+
 r2 = model.score(X, y)
 
 
@@ -320,23 +369,27 @@ r2 = model.score(X, y)
 # --------------------------------------------------
 
 st.divider()
+
 st.subheader("☔ 강수량 예측 결과")
 
 result_col1, result_col2, result_col3 = st.columns(3)
 
 with result_col1:
+
     st.metric(
         label="선택한 월",
         value=month_names[selected_month]
     )
 
 with result_col2:
+
     st.metric(
         label="예측 연도",
         value=f"{selected_year}년"
     )
 
 with result_col3:
+
     st.metric(
         label="예측 강수량",
         value=f"{prediction:.1f} mm"
@@ -354,9 +407,12 @@ st.info(
 # --------------------------------------------------
 
 st.divider()
+
 st.subheader("📊 과거 강수량과 미래 예측 비교")
 
-fig, ax = plt.subplots(figsize=(13, 6))
+fig, ax = plt.subplots(
+    figsize=(13, 6)
+)
 
 # 과거 데이터 막대그래프
 ax.bar(
@@ -369,19 +425,30 @@ ax.bar(
 )
 
 # 회귀선
-min_year = int(month_df["연도"].min())
+min_year = int(
+    month_df["연도"].min()
+)
+
 max_year = max(
     int(month_df["연도"].max()),
     int(selected_year)
 )
 
-line_years = np.arange(min_year, max_year + 1)
-
-line_predictions = model.predict(
-    pd.DataFrame({"연도": line_years})
+line_years = np.arange(
+    min_year,
+    max_year + 1
 )
 
-line_predictions = np.maximum(line_predictions, 0)
+line_predictions = model.predict(
+    pd.DataFrame({
+        "연도": line_years
+    })
+)
+
+line_predictions = np.maximum(
+    line_predictions,
+    0
+)
 
 ax.plot(
     line_years,
@@ -419,8 +486,15 @@ ax.set_title(
     pad=20
 )
 
-ax.set_xlabel("연도", fontsize=12)
-ax.set_ylabel("강수량 (mm)", fontsize=12)
+ax.set_xlabel(
+    "연도",
+    fontsize=12
+)
+
+ax.set_ylabel(
+    "강수량 (mm)",
+    fontsize=12
+)
 
 ax.grid(
     axis="y",
@@ -429,9 +503,11 @@ ax.grid(
 )
 
 ax.legend()
+
 fig.tight_layout()
 
 st.pyplot(fig)
+
 plt.close(fig)
 
 
@@ -440,6 +516,7 @@ plt.close(fig)
 # --------------------------------------------------
 
 st.divider()
+
 st.subheader("🤖 선형회귀 알고리즘 알아보기")
 
 st.markdown("""
@@ -456,13 +533,21 @@ st.markdown("""
 
 st.markdown("### 📐 선형회귀 계산식")
 
-st.latex(r"y = ax + b")
+st.latex(
+    r"y = ax + b"
+)
 
-st.write(f"- **a (기울기):** {slope:.4f}")
+st.write(
+    f"- **a (기울기):** {slope:.4f}"
+)
 
-st.write(f"- **b (절편):** {intercept:.4f}")
+st.write(
+    f"- **b (절편):** {intercept:.4f}"
+)
 
-st.write(f"- **결정계수 (R²):** {r2:.4f}")
+st.write(
+    f"- **결정계수 (R²):** {r2:.4f}"
+)
 
 st.caption(
     "결정계수는 모델이 과거 데이터의 변화를 얼마나 설명하는지 "
@@ -475,6 +560,7 @@ st.caption(
 # --------------------------------------------------
 
 st.divider()
+
 st.subheader("📋 선택한 월의 과거 강수량 데이터")
 
 display_df = month_df[
