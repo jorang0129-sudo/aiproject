@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # --------------------------------------------------
-# 2. 배경 디자인 및 천천히 떨어지는 물방울 효과
+# 2. 배경 디자인 및 빠르게 떨어지는 물방울 효과
 # --------------------------------------------------
 
 st.markdown("""
@@ -38,43 +38,45 @@ st.markdown("""
 
 /* 첫 번째 물방울 */
 .stApp::before {
-    content: "💧       💧          💧       💧          💧       💧";
+    content: "💧  💧   💧  💧   💧  💧   💧  💧   💧  💧   💧  💧";
     position: fixed;
-    top: -60px;
+    top: -100px;
     left: 0;
     width: 100%;
-    height: 100%;
-    font-size: 20px;
-    letter-spacing: 25px;
-    word-spacing: 30px;
-    opacity: 0.25;
+    height: 120%;
+    font-size: 22px;
+    letter-spacing: 15px;
+    word-spacing: 15px;
+    opacity: 0.30;
     pointer-events: none;
     z-index: 0;
-    white-space: nowrap;
-    animation: slowRain 40s linear infinite;
+    white-space: normal;
+    line-height: 110px;
+    animation: rainFall 12s linear infinite;
 }
 
 /* 두 번째 물방울 */
 .stApp::after {
-    content: "💧          💧       💧          💧       💧";
+    content: "💧    💧  💧    💧  💧    💧  💧    💧  💧    💧";
     position: fixed;
-    top: -100px;
-    left: 10%;
+    top: -150px;
+    left: 5%;
     width: 100%;
-    height: 100%;
-    font-size: 16px;
-    letter-spacing: 45px;
-    opacity: 0.18;
+    height: 130%;
+    font-size: 17px;
+    letter-spacing: 25px;
+    opacity: 0.20;
     pointer-events: none;
     z-index: 0;
-    white-space: nowrap;
-    animation: slowRain 55s linear infinite;
+    white-space: normal;
+    line-height: 85px;
+    animation: rainFall 8s linear infinite;
 }
 
 /* 물방울 이동 */
-@keyframes slowRain {
+@keyframes rainFall {
     0% {
-        transform: translateY(-50px);
+        transform: translateY(-100px);
     }
 
     100% {
@@ -113,6 +115,7 @@ div[data-baseweb="select"] {
 # --------------------------------------------------
 
 st.title("🌧️ 월별 강수량 예측")
+
 st.markdown(
     "과거의 강수량 데이터를 분석해서 미래의 강수량을 예측해 봐요! 💧"
 )
@@ -145,7 +148,6 @@ except Exception as e:
 # 5. 데이터 전처리
 # --------------------------------------------------
 
-# 필요한 열이 있는지 확인
 required_columns = ["일시", "강수량(mm)"]
 
 if not all(col in df.columns for col in required_columns):
@@ -166,6 +168,7 @@ df["강수량(mm)"] = pd.to_numeric(
 
 df = df.dropna(subset=["일시", "강수량(mm)"])
 
+
 # 월 이름 변환
 month_dict = {
     "Jan": 1,
@@ -181,6 +184,7 @@ month_dict = {
     "Nov": 11,
     "Dec": 12
 }
+
 
 # 날짜에서 월과 연도 추출
 def extract_date(value):
@@ -346,7 +350,10 @@ ax.bar(
 
 # 회귀선
 min_year = int(month_df["연도"].min())
-max_year = max(int(month_df["연도"].max()), int(selected_year))
+max_year = max(
+    int(month_df["연도"].max()),
+    int(selected_year)
+)
 
 line_years = np.arange(min_year, max_year + 1)
 
@@ -431,17 +438,11 @@ st.markdown("### 📐 선형회귀 계산식")
 
 st.latex(r"y = ax + b")
 
-st.write(
-    f"- **a (기울기):** {slope:.4f}"
-)
+st.write(f"- **a (기울기):** {slope:.4f}")
 
-st.write(
-    f"- **b (절편):** {intercept:.4f}"
-)
+st.write(f"- **b (절편):** {intercept:.4f}")
 
-st.write(
-    f"- **결정계수 (R²):** {r2:.4f}"
-)
+st.write(f"- **결정계수 (R²):** {r2:.4f}")
 
 st.caption(
     "결정계수는 모델이 과거 데이터의 변화를 얼마나 설명하는지 "
@@ -460,7 +461,10 @@ display_df = month_df[
     ["연도", "강수량(mm)"]
 ].copy()
 
-display_df = display_df.sort_values("연도", ascending=False)
+display_df = display_df.sort_values(
+    "연도",
+    ascending=False
+)
 
 st.dataframe(
     display_df,
